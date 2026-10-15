@@ -9,10 +9,14 @@ Run from the repository root using npm and the committed `package-lock.json`:
 - `npm run build` builds the server application into `dist/`.
 - `npm run preview` previews the built application.
 - `npm run astro -- <command>` invokes the Astro CLI.
+- `npm test` runs Vitest unit tests.
+- `npm test -- src/lib/contributions.test.ts` runs one test file.
+- `npm test -- src/lib/contributions.test.ts -t "expires cached data"` runs a
+  single named test.
+- `npm run typecheck` generates Astro types and checks TypeScript code.
 
 With the dev server running, inspect the contribution route with
-`curl -i http://localhost:4321/api/contributions/octocat`. The starter currently
-returns HTTP 501 with `{"error":"Not implemented"}`.
+`curl -i http://localhost:4321/api/contributions/octocat`.
 
 ## Application architecture
 
@@ -26,11 +30,18 @@ renders only a title and welcome paragraph.
 
 `src/pages/api/contributions/[username].ts` defines the runtime endpoint
 `/api/contributions/:username`: a typed Astro `APIRoute` GET handler with
-`prerender = false`. It is currently a JSON error stub. The planned data flow is
-browser interaction -> same-origin contribution route -> GitHub upstream.
-Keep the upstream request server-side to avoid browser CORS restrictions.
-The workshop names `https://github.com/{username}.contribs`; verify its actual
-response format before defining parsing logic or contribution interfaces.
+`prerender = false`. It delegates to `src/lib/contributions.ts`, which validates
+usernames, fetches `https://github.com/{username}.contribs`, and normalizes its
+observed JSON v2 schema. Days derive from each week's `first_day` plus
+`weekday` using UTC arithmetic, including partial weeks.
+Keep upstream requests server-side and the route's success/error contracts
+stable; README documents their fields and status mappings.
+
+The service has a ten-second fetch/body deadline, a 1 MiB body limit, and
+no redirects or retries. Its five-minute, 500-user process-local cache includes
+in-flight entries and coalesces same-user requests. Cache only validated
+successes; never serve stale data. HTTP responses use `Cache-Control: no-store`
+because caching is handled inside the service.
 
 The planned battle page fetches both users in parallel and renders daily grids,
 totals, and date ranges, with loading/error states and Enter-key submission.
@@ -39,6 +50,10 @@ Use the relevant `workshop/02-plan-and-scaffold.md` and
 
 ## Code and design conventions
 
+- Follow test-first development: establish meaningful failing behavior tests
+  before implementing a change, then confirm they pass. Service tests inject
+  fetch/time rather than contacting GitHub. Keep route tests in `tests/`, not
+  `src/pages/`, where Astro would treat them as routes.
 - TypeScript extends `astro/tsconfigs/strict`. Preserve typed Astro route
   handlers and use explicit interfaces for contribution data shared by the API
   and client.

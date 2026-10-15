@@ -62,22 +62,99 @@ The workshop supports two tracks — follow the one that matches your preferred 
 - **Font**: Press Start 2P (retro gaming font)
 - **API**: GitHub's contribution graph API
 
+## Development and validation
+
+```bash
+npm ci
+npm run dev
+```
+
+The development server runs at `http://localhost:4321`.
+
+```bash
+npm test
+npm test -- src/lib/contributions.test.ts
+npm test -- src/lib/contributions.test.ts -t "expires cached data"
+npm run typecheck
+npm run build
+npm run preview
+```
+
+Unit tests use Vitest with mocked upstream requests and deterministic clocks.
+`typecheck` generates Astro types and checks TypeScript code; `build` creates
+the standalone Node application.
+
+## Contribution API
+
+`GET /api/contributions/:username` fetches public contribution data from
+`https://github.com/{username}.contribs` on the server and normalizes GitHub's
+JSON v2 format. The battle-page UI is still a starter.
+
+```bash
+curl -i http://localhost:4321/api/contributions/octocat
+curl -i http://localhost:4321/api/contributions/bad_name
+```
+
+Successful responses have this shape (illustrative values):
+
+```json
+{
+  "username": "octocat",
+  "totalContributions": 3,
+  "from": "2026-10-14",
+  "to": "2026-10-14",
+  "days": [
+    { "date": "2026-10-14", "count": 3, "level": 1 }
+  ]
+}
+```
+
+Dates are inclusive, UTC-derived `YYYY-MM-DD` values. Days are sorted
+chronologically; counts are nonnegative integers and levels range from 0 to 4.
+Usernames are case-insensitive and returned in lowercase. They must contain
+1-39 ASCII letters, digits, or hyphens, without leading, trailing, or consecutive
+hyphens.
+
+Errors return `{"error":"Human-readable message","code":"STABLE_ERROR_CODE"}`:
+
+| HTTP status | Code | Meaning |
+| --- | --- | --- |
+| 400 | `INVALID_USERNAME` | Invalid username |
+| 404 | `USER_NOT_FOUND` | GitHub user does not exist |
+| 502 | `UPSTREAM_ERROR` | Network failure or other unexpected upstream status/redirect |
+| 502 | `INVALID_UPSTREAM_DATA` | Invalid JSON, unsupported schema/content, inconsistent data, or oversized body |
+| 503 | `UPSTREAM_UNAVAILABLE` | GitHub throttling or upstream server failure |
+| 503 | `SERVICE_BUSY` | All local cache slots have in-flight requests |
+| 504 | `UPSTREAM_TIMEOUT` | GitHub request exceeded ten seconds |
+| 500 | `INTERNAL_ERROR` | Unexpected internal failure |
+
+Each upstream request has a ten-second deadline including body consumption and
+a 1 MiB body limit. Requests are not retried and redirects are not followed.
+
+Validated successes are cached for five minutes after fetching completes.
+The process-local cache holds at most 500 usernames, including in-flight
+requests; concurrent requests for the same username share one fetch.
+Expired entries are removed before least-recently-used completed entries are
+evicted. Failures are not cached and stale results are never served. The cache
+resets on restart and is not shared across server instances. HTTP responses
+use `Cache-Control: no-store` so browsers/CDNs do not add a separate cache.
+
 ## Deployment Notes
 
 ### Current GitHub Pages setup
 
 The workflow in `.github/workflows/deploy.yml` currently deploys static workshop/docs content from `docs/` and `workshop/` to GitHub Pages. It does not build or deploy the Astro app from `src/`.
 
-### If you want to deploy the Astro app to GitHub Pages
+### Deploying the Astro application
 
-GitHub Pages is static hosting, so the Astro app should use static output.
+The contribution proxy needs a runtime server. Keep server output and the
+standalone Node adapter, build with `npm run build`, and run
+`node dist/server/entry.mjs` on a Node host. `HOST` and `PORT` control the
+listening address.
 
-1. Change `output` in `astro.config.mjs` from `server` to `static`.
-2. Remove the Node adapter (`@astrojs/node`) from `astro.config.mjs` and `package.json`.
-3. Update the GitHub Actions workflow to run `npm ci` and `npm run build`, then upload `dist/` as the Pages artifact.
-4. If deploying to a project page (`https://<user>.github.io/<repo>/`), set `site` and `base` in `astro.config.mjs`.
-
-If you plan to keep API routes running in production, use a server platform instead of GitHub Pages (for example, Vercel, Netlify, or a Node host).
+GitHub Pages cannot host this application unchanged. A static-only deployment
+would require removing or moving the contribution API to a separate backend
+and adapting the client first; changing Astro output alone is insufficient.
 
 ## License
 
