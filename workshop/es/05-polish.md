@@ -3,13 +3,14 @@
 
 ---
 
-Ahora que la aplicación funciona y se ve genial, es hora de pulir. Esta parte trata sobre dividir el trabajo para que puedas mejorar la responsividad, el manejo de errores y la calidad sin hacer todo en un solo bucle serial.
+Ahora que la aplicación funciona y tiene muy buen aspecto, es hora de pulirla. Esta parte trata de repartir el trabajo para mejorar la adaptabilidad, la gestión de errores y la calidad sin hacerlo todo en un único bucle secuencial.
 
 <!-- track:vscode:start -->
 ## Tarea 1: Agente en Segundo Plano para Diseño Responsivo
 
-1. En el panel de Chat, haz clic en **+** → **New background agent**.
-2. Ingresa este prompt:
+1. En el panel de Chat, haz clic en **+** para iniciar un chat nuevo
+2. En la parte inferior de la ventana verás que **Local** cambia a **Copilot CLI**
+3. Escribe este prompt:
 
    ```
    Add responsive CSS media queries: at 1024px switch comparison to single column,
@@ -18,13 +19,13 @@ Ahora que la aplicación funciona y se ve genial, es hora de pulir. Esta parte t
    Enter triggers battle, and focus states are visible.
    ```
 
-3. Déjalo ejecutarse de forma independiente — no necesitas observarlo.
-4. Cuando termine, **Revisa** los cambios y haz clic en **Apply**.
+4. Déjalo ejecutarse de forma independiente: no necesitas vigilarlo.
+5. Cuando termine, **revisa** los cambios y haz clic en **Apply**.
 
 ## Tarea 2: Agente en Segundo Plano para UX de Errores
 
 1. Inicia otro agente en segundo plano.
-2. Ingresa este prompt:
+2. Escribe este prompt:
 
    ```
    Improve the error experience: add a shake animation for errors, styled error
@@ -37,8 +38,9 @@ Ahora que la aplicación funciona y se ve genial, es hora de pulir. Esta parte t
 
 ## Tarea 3: Agente en la Nube para Variaciones (Opcional)
 
-1. Haz clic en **+** → **New cloud agent**.
-2. Ingresa este prompt:
+1. En el panel de Chat, haz clic en **+** para iniciar un chat nuevo
+2. En la parte inferior de la ventana verás que **Local** cambia a **Cloud**
+3. Escribe este prompt:
 
    ```
    Create an alternative color theme for the battle page — keep the retro arcade
@@ -46,8 +48,8 @@ Ahora que la aplicación funciona y se ve genial, es hora de pulir. Esta parte t
    Create it as a CSS custom property theme that could be toggled.
    ```
 
-3. Revisa las **sesiones de agentes** para monitorear el progreso.
-4. Revisa la variación de diseño en el PR que el agente en la nube crea.
+4. Consulta las **sesiones de agentes** para supervisar el progreso.
+5. Revisa la variación de diseño en la pull request que crea el agente en la nube.
 
 ## Tarea 4: Verifica Todo
 <!-- track:vscode:end -->

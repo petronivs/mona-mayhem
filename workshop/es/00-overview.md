@@ -7,7 +7,7 @@
 > **Nivel:** Intermedio  
 > **Stack:** Astro / Node.js / TypeScript
 
-Construye una aplicación retro estilo arcade para comparar contribuciones de GitHub — **Mona Mayhem** — mientras aprendes todo el espectro de flujos de trabajo de GitHub Copilot. El taller soporta **dos pistas**: una experiencia en VS Code y una experiencia con GitHub Copilot CLI.
+Construye una aplicación retro estilo arcade para comparar contribuciones de GitHub — **Mona Mayhem** — mientras aprendes todo el espectro de flujos de trabajo de GitHub Copilot. El taller admite **dos pistas**: una experiencia en VS Code y una experiencia con GitHub Copilot CLI.
 
 ---
 

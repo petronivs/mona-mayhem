@@ -62,7 +62,7 @@ Persista os resultados das batalhas para que os usuários possam ver seus confro
 
 ## 🏆 Desafio 4: Efeitos Sonoros
 
-Adicione efeitos sonoros retro arcade usando a Web Audio API — sem necessidade de arquivos externos.
+Adicione efeitos sonoros retrô arcade usando a Web Audio API — sem necessidade de arquivos externos.
 
 **O que construir:**
 - Som de **inserir moeda** quando o botão "Battle!" for clicado
@@ -137,7 +137,7 @@ Você completou o workshop **Mona Mayhem: GitHub Battle**! Aqui está o que voc�
 ### O Que Você Construiu
 
 - ✅ Um **aplicativo web completo de múltiplas páginas** a partir de uma especificação de design
-- ✅ Uma **página inicial** com temática retro arcade e layout responsivo
+- ✅ Uma **página inicial** com temática retrô arcade e layout responsivo
 - ✅ Uma **arena de batalha** que busca e compara dados reais de contribuições do GitHub
 - ✅ **Gráficos de contribuições interativos** com níveis de atividade codificados por cores
 - ✅ **Tratamento de erros, estados de carregamento e melhorias de acessibilidade**
@@ -147,9 +147,9 @@ Você completou o workshop **Mona Mayhem: GitHub Battle**! Aqui está o que voc�
 
 | Habilidade | O Que Você Praticou |
 |------------|---------------------|
-| **Context Engineering** | Dar ao Copilot os arquivos, instruções e restrições corretas |
+| **Engenharia de Contexto** | Dar ao Copilot os arquivos, instruções e restrições corretas |
 | **Planejamento** | Gerar e refinar planos de implementação antes de programar |
-| **Codificação Agêntica** | Delegar trabalho em múltiplos arquivos e múltiplas etapas ao Copilot |
+| **Codificação Agentic** | Delegar trabalho em múltiplos arquivos e múltiplas etapas ao Copilot |
 | **Iteração de Design** | Começar de uma direção visual e refinar até um resultado polido |
 | **Disciplina de Revisão** | Inspecionar alterações geradas por IA antes de fazer commit |
 

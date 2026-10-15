@@ -1,5 +1,5 @@
 <!-- l10n-sync: source-file="workshop/01-setup.md" -->
-# Parte 1: Configuração e Context Engineering
+# Parte 1: Configuração e Engenharia de Contexto
 
 ---
 
@@ -98,9 +98,9 @@ Use o caminho de instalação que corresponde à sua máquina:
 > ✅ **Agora você tem a pré-visualização do aplicativo em um terminal e o Copilot CLI pronto em outro.**
 <!-- track:cli:end -->
 
-## Seção 2: Context Engineering
+## Seção 2: Engenharia de Contexto
 
-Context Engineering é como você ensina a IA sobre sua base de código. Quanto melhor o contexto, melhor será cada resposta futura.
+A engenharia de contexto é como você ensina a IA sobre sua base de código. Quanto melhor o contexto, melhor será cada resposta futura.
 
 <!-- track:vscode:start -->
 ### Tarefa 1: Gere Instruções do Workspace com /init
@@ -122,16 +122,18 @@ Vamos usar o comando integrado `/init` para gerar um arquivo de instruções do 
 
 **Agente em segundo plano local:**
 
-1. No painel de Chat, clique em **+** → **New background agent**
-2. Digite o prompt:
+1. No painel de Chat, clique em **+** para iniciar um novo chat
+2. Na parte inferior da janela, você verá **Local** mudar para **Copilot CLI**
+3. Digite o prompt:
 
    > "Add linting rules for unused vars and improve code style; fix any errors"
 
-3. Quando terminar, **Revise e Aplique** as alterações, depois delete a sessão.
+4. Quando terminar, **Revise e Aplique** as alterações e, se quiser, arquive a sessão.
 
 **Agente na nuvem:**
 
-1. Inicie outro agente em segundo plano com:
+1. No painel de Chat, clique em **+** para iniciar um novo chat
+2. Na parte inferior da janela, você verá **Local** mudar para **Cloud**
 
    > "Make the README more engaging as a landing page"
 
@@ -197,9 +199,9 @@ copilot -p "Summarize the architecture of this repo in 5 bullet points"
 > **Resultado:** Agora você tem instruções, conhecimento de comandos e uma noção de como alimentar arquivos no contexto do Copilot CLI.
 <!-- track:cli:end -->
 
-## ✅ Parte 1 Completa
+## ✅ Parte 1 Concluída
 
-Você aprendeu como:
+Você aprendeu a:
 
 - **Configurar** o repositório e o ambiente de desenvolvimento local
 - **Gerar instruções** com `/init` para que o Copilot entenda seu projeto e a direção de design

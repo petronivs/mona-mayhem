@@ -62,22 +62,79 @@
 - **글꼴:** Press Start 2P(레트로 게임 글꼴)
 - **API:** GitHub 기여 그래프 API
 
+## 개발 및 검증
+
+```bash
+npm ci
+npm run dev
+```
+
+개발 서버는 `http://localhost:4321`에서 실행됩니다.
+
+```bash
+npm test
+npm test -- src/lib/contributions.test.ts
+npm test -- src/lib/contributions.test.ts -t "expires cached data"
+npm run typecheck
+npm run build
+npm run preview
+```
+
+단위 테스트는 Vitest와 모의(mock) 업스트림 요청, 결정적(deterministic) 시계를 사용합니다. `typecheck`는 Astro 타입을 생성하고 TypeScript 코드를 검사하며, `build`는 독립 실행형 Node 애플리케이션을 만듭니다.
+
+## 기여도 API
+
+`GET /api/contributions/:username`은 서버에서 `https://github.com/{username}.contribs`의 공개 기여도 데이터를 가져와 GitHub의 JSON v2 형식을 정규화합니다. 배틀 페이지 UI는 아직 시작 템플릿 상태입니다.
+
+```bash
+curl -i http://localhost:4321/api/contributions/octocat
+curl -i http://localhost:4321/api/contributions/bad_name
+```
+
+성공 응답은 다음과 같은 형태입니다(예시 값).
+
+```json
+{
+  "username": "octocat",
+  "totalContributions": 3,
+  "from": "2026-10-14",
+  "to": "2026-10-14",
+  "days": [
+    { "date": "2026-10-14", "count": 3, "level": 1 }
+  ]
+}
+```
+
+날짜는 양 끝을 포함하며 UTC 기준으로 계산한 `YYYY-MM-DD` 값입니다. 일별 데이터는 시간순으로 정렬되고, 개수(count)는 0 이상의 정수이며, 레벨(level)은 0부터 4까지입니다. 사용자 이름은 대소문자를 구분하지 않으며 소문자로 반환됩니다. 사용자 이름은 ASCII 문자, 숫자 또는 하이픈 1~39자로 구성되어야 하고, 하이픈으로 시작하거나 끝나거나 연속될 수 없습니다.
+
+오류는 `{"error":"Human-readable message","code":"STABLE_ERROR_CODE"}` 형식으로 반환됩니다.
+
+| HTTP 상태 | 코드 | 의미 |
+| --- | --- | --- |
+| 400 | `INVALID_USERNAME` | 잘못된 사용자 이름 |
+| 404 | `USER_NOT_FOUND` | GitHub 사용자가 존재하지 않음 |
+| 502 | `UPSTREAM_ERROR` | 네트워크 오류 또는 그 밖의 예기치 않은 업스트림 상태/리디렉션 |
+| 502 | `INVALID_UPSTREAM_DATA` | 잘못된 JSON, 지원되지 않는 스키마/콘텐츠, 일관되지 않은 데이터 또는 과도하게 큰 본문 |
+| 503 | `UPSTREAM_UNAVAILABLE` | GitHub 요청 제한 또는 업스트림 서버 오류 |
+| 503 | `SERVICE_BUSY` | 모든 로컬 캐시 슬롯에 진행 중인 요청이 있음 |
+| 504 | `UPSTREAM_TIMEOUT` | GitHub 요청이 10초를 초과함 |
+| 500 | `INTERNAL_ERROR` | 예기치 않은 내부 오류 |
+
+각 업스트림 요청에는 본문 수신까지 포함해 10초의 제한 시간과 1 MiB의 본문 크기 제한이 적용됩니다. 요청은 재시도하지 않으며 리디렉션도 따라가지 않습니다.
+
+검증된 성공 응답은 가져오기가 완료된 시점부터 5분간 캐시됩니다. 프로세스 로컬 캐시에는 진행 중인 요청을 포함해 최대 500개의 사용자 이름을 보관하며, 같은 사용자 이름에 대한 동시 요청은 하나의 가져오기를 공유합니다. 만료된 항목을 먼저 제거한 다음, 완료된 항목 중 가장 오래 사용되지 않은 항목부터 제거합니다. 실패는 캐시하지 않으며 오래된 결과는 절대 제공하지 않습니다. 캐시는 재시작하면 초기화되고 서버 인스턴스 간에 공유되지 않습니다. 브라우저나 CDN이 별도의 캐시를 추가하지 않도록 HTTP 응답에는 `Cache-Control: no-store`를 사용합니다.
+
 ## 배포 참고 사항
 
 ### 현재 GitHub Pages 구성
 
 현재 `.github/workflows/deploy.yml` 워크플로는 `docs/` 및 `workshop/`의 정적 콘텐츠를 GitHub Pages에 배포합니다. `src/`의 Astro 앱을 빌드하거나 배포하지는 않습니다.
 
-### Astro 앱을 GitHub Pages에 배포하려는 경우
+### Astro 애플리케이션 배포
 
-GitHub Pages는 정적 호스팅이므로 Astro 앱도 정적 출력을 사용해야 합니다.
+기여도 프록시에는 런타임 서버가 필요합니다. 서버 출력과 독립 실행형 Node 어댑터를 유지하고, `npm run build`로 빌드한 다음 Node 호스트에서 `node dist/server/entry.mjs`를 실행합니다. `HOST`와 `PORT`로 수신 주소를 제어합니다.
 
-1. `astro.config.mjs`의 `output`을 `server`에서 `static`으로 변경합니다.
-2. `astro.config.mjs`와 `package.json`에서 Node 어댑터(`@astrojs/node`)를 제거합니다.
-3. GitHub Actions 워크플로에서 `npm ci`와 `npm run build`를 실행한 다음, Pages 아티팩트로 `dist/`를 업로드하도록 변경합니다.
-4. 프로젝트 페이지(`https://<user>.github.io/<repo>/`)에 배포한다면 `astro.config.mjs`에서 `site`와 `base`를 설정합니다.
-
-프로덕션에서 API 라우트를 계속 실행해야 한다면 GitHub Pages 대신 Vercel, Netlify 또는 Node.js 호스트와 같은 서버 플랫폼을 사용합니다.
+GitHub Pages는 이 애플리케이션을 변경 없이 호스팅할 수 없습니다. 정적 전용 배포를 하려면 먼저 기여도 API를 제거하거나 별도의 백엔드로 옮기고 클라이언트를 맞게 수정해야 하며, Astro 출력 설정만 바꾸는 것으로는 충분하지 않습니다.
 
 ## 라이선스
 

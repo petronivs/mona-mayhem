@@ -377,7 +377,7 @@
 
             const step = steps.find(s => s.id === stepId);
             if (!step) {
-                document.getElementById('markdownContent').innerHTML = '<p>Passo não encontrado.</p>';
+                document.getElementById('markdownContent').innerHTML = '<p>Etapa não encontrada.</p>';
                 return;
             }
 
@@ -412,7 +412,7 @@
                 contentEl.innerHTML = `
                     <div class="markdown">
                         <h1>${step.title}</h1>
-                        <p>Não foi possível carregar o conteúdo. Por favor, verifique o <a href="https://github.com/copilot-dev-days/mona-mayhem" target="_blank">repositório GitHub</a> diretamente.</p>
+                        <p>Não foi possível carregar o conteúdo. Verifique o <a href="https://github.com/copilot-dev-days/mona-mayhem" target="_blank">repositório GitHub</a> diretamente.</p>
                         <p style="color: var(--text-secondary); font-size: 0.875rem;">Error: ${err.message}</p>
                     </div>`;
             }
